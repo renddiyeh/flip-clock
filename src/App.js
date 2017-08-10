@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
-import getSeconds from 'date-fns/get_seconds';
-import getMinutes from 'date-fns/get_minutes';
-import getHours from 'date-fns/get_hours';
+import format from 'date-fns/format';
+import map from 'lodash/map';
 
 import Flip from './Flip';
 
@@ -31,12 +30,12 @@ export default class App extends PureComponent {
   }))
 
   render() {
-    const now = new Date();
+    const date = format(new Date(), 'HHmmss');
     return (
       <Clock>
-        <Flip value={getHours(now)} />
-        <Flip value={getMinutes(now)} />
-        <Flip value={getSeconds(now)} />
+        {map(date, (d, index) => (
+          <Flip key={`clock-${index}`} value={+d} style={!(index % 2) ? { marginLeft: '0.5em' } : null} />
+        ))}
       </Clock>
     );
   }

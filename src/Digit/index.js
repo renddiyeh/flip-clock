@@ -3,12 +3,6 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import TWEEN from '@tweenjs/tween.js';
 
-function pad(n, width, padder = '0') {
-  const number = n.toString();
-  const { length } = number;
-  return length >= width ? number : new Array((width - length) + 1).join(padder) + n;
-}
-
 /* eslint-disable no-param-reassign */
 function setTransform(element, transfromString) {
   if (!element) return;
@@ -19,6 +13,8 @@ function setTransform(element, transfromString) {
   element.style.transform = transfromString;
 }
 /* eslint-enable no-param-reassign */
+
+const offset = 4;
 
 const Wrapper = styled.div`
   line-height: 2;
@@ -34,16 +30,18 @@ const FlipCard = styled.div`
   left: 0;
   width: 100%;
   height: 50%;
+  font-size: 225%;
   position: absolute;
   overflow: hidden;
-  border: 1px solid black;
+  border: 2px solid black;
+  border-radius: 0.75rem;
 `;
 
 const FlipFront = styled(FlipCard)`
   transform-origin: 50% 100%;
   top: 0;
   ${({ flipped }) => flipped && `
-    transform: rotateX(180deg);
+    transform: rotateX(180deg) translateY(-${offset}px);
   `}
 `;
 
@@ -52,7 +50,7 @@ const FlipBack = styled(FlipCard)`
   transform: rotateX(-180deg);
   bottom: 0;
   ${({ flipped }) => flipped && `
-    transform: rotateX(0);
+    transform: rotateX(0) translateY(${offset}px);
     z-index: 5;
   `}
   ${({ zFlipped }) => zFlipped && `
@@ -89,11 +87,11 @@ export default class FlipClock extends PureComponent {
   }
 
   componentDidMount() {
-    const tween = new TWEEN.Tween({ rotate: 0 });
-    tween.to({ rotate: 180 }, flipDuration)
-      .onUpdate(({ rotate }) => {
-        setTransform(this.back, `rotateX(${-180 + rotate}deg)`);
-        setTransform(this.front, `rotateX(${rotate}deg)`);
+    const tween = new TWEEN.Tween({ rotate: 0, y: 0 });
+    tween.to({ rotate: 180, y: offset }, flipDuration)
+      .onUpdate(({ rotate, y }) => {
+        setTransform(this.back, `rotateX(${-180 + rotate}deg) translateY(${y}px)`);
+        setTransform(this.front, `rotateX(${rotate}deg) translateY(-${y}px)`);
       })
       .onComplete(() => {
         this.setState({ completed: true });
@@ -128,13 +126,14 @@ export default class FlipClock extends PureComponent {
   render() {
     const { flipped } = this.props;
     const { value, zFlipped } = this.state;
+    const num = value % 10;
     return (
-      <Wrapper style={{ zIndex: 60 - value }}>
+      <Wrapper style={{ zIndex: 10 - num }}>
         <FlipBack innerRef={(ref) => (this.back = ref)} zFlipped={zFlipped} flipped={flipped}>
-          <DigitLower>{pad(value, 2)}</DigitLower>
+          <DigitLower>{num}</DigitLower>
         </FlipBack>
         <FlipFront innerRef={(ref) => (this.front = ref)} zFlipped={zFlipped} flipped={flipped}>
-          <DigitUpper>{pad(value, 2)}</DigitUpper>
+          <DigitUpper>{num}</DigitUpper>
         </FlipFront>
       </Wrapper>
     );
