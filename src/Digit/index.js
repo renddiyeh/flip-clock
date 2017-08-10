@@ -58,23 +58,23 @@ const FlipBack = styled(FlipCard)`
   `}
 `;
 
-const Digit = styled.div`
+const DigitCard = styled.div`
   position: absolute;
   left: 50%;
   transform: translate(-50%, -50%);
 `;
 
-const DigitUpper = styled(Digit)`
+const DigitUpper = styled(DigitCard)`
   top: 100%;
 `;
 
-const DigitLower = styled(Digit)`
+const DigitLower = styled(DigitCard)`
   top: 0;
 `;
 
 const flipDuration = 250;
 
-export default class FlipClock extends PureComponent {
+export default class Digit extends PureComponent {
   static propTypes = {
     flipped: PropTypes.bool,
     value: PropTypes.number,
