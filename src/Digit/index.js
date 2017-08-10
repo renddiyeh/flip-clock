@@ -79,7 +79,6 @@ const flipDuration = 250;
 export default class FlipClock extends PureComponent {
   static propTypes = {
     flipped: PropTypes.bool,
-    freeeze: PropTypes.bool,
     value: PropTypes.number,
   }
 
@@ -104,8 +103,8 @@ export default class FlipClock extends PureComponent {
   }
 
   componentWillReceiveProps({ value }) {
-    const { flipped, freeeze } = this.props;
-    if (freeeze || this.state.completed) return;
+    const { flipped } = this.props;
+    if (this.state.completed) return;
     if (value !== this.props.value) {
       if (flipped) {
         setTimeout(() => this.setState({ value }), flipDuration / 2);
