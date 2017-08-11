@@ -12,31 +12,60 @@ const Clock = styled.div`
 
 export default class App extends PureComponent {
   state = {
-    value: 1,
+    iter: 0,
+    pause: false,
   }
 
   componentDidMount() {
+    this.startTimter();
+    // setTimeout(() => {
+    //   this.tick();
+    // }, 1000);
+  }
+
+  componentWillUnmount() {
+    this.stopTimer();
+  }
+
+  handleClick = () => {
+    const { pause } = this.state;
+    if (pause) {
+      this.startTimter();
+    } else {
+      this.stopTimer();
+    }
+    this.setState({ pause: !pause });
+  }
+
+  startTimter = () => {
     this.timer = setInterval(() => {
       this.tick();
     }, 1000);
   }
 
-  componentWillUnmount() {
-    clearInterval(this.timer);
-  }
+  stopTimer = () => clearInterval(this.timer)
 
-  tick = () => this.setState(({ value }) => ({
-    value: value + 1,
+  tick = () => this.setState(({ iter }) => ({
+    iter: iter + 1,
   }))
 
   render() {
+    const { iter, pause } = this.state;
     const date = format(new Date(), 'HHmmss');
     return (
-      <Clock>
-        {map(date, (d, index) => (
-          <Flip key={`clock-${index}`} value={+d} style={!(index % 2) ? { marginLeft: '0.5em' } : null} />
-        ))}
-      </Clock>
+      <div>
+        <Clock>
+          {map(date, (d, index) => (
+            <Flip
+              key={`clock-${index}`}
+              value={+d}
+              iter={iter}
+              style={!(index % 2) ? { marginLeft: '0.5em' } : null}
+            />
+          ))}
+        </Clock>
+        <button onClick={this.handleClick}>{pause ? 'Start' : 'Pause'}</button>
+      </div>
     );
   }
 }

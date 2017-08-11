@@ -14,7 +14,7 @@ function setTransform(element, transfromString) {
 }
 /* eslint-enable no-param-reassign */
 
-const offset = 4;
+const yOffset = 4;
 
 const Wrapper = styled.div`
   line-height: 2;
@@ -41,7 +41,7 @@ const FlipFront = styled(FlipCard)`
   transform-origin: 50% 100%;
   top: 0;
   ${({ flipped }) => flipped && `
-    transform: rotateX(180deg) translateY(-${offset}px);
+    transform: rotateX(180deg) translateY(-${yOffset}px);
   `}
 `;
 
@@ -50,7 +50,7 @@ const FlipBack = styled(FlipCard)`
   transform: rotateX(-180deg);
   bottom: 0;
   ${({ flipped }) => flipped && `
-    transform: rotateX(0) translateY(${offset}px);
+    transform: rotateX(0) translateY(${yOffset}px);
     z-index: 5;
   `}
   ${({ zFlipped }) => zFlipped && `
@@ -72,7 +72,7 @@ const DigitLower = styled(DigitCard)`
   top: 0;
 `;
 
-const flipDuration = 250;
+const flipDuration = 500;
 
 export default class Digit extends PureComponent {
   static propTypes = {
@@ -88,7 +88,7 @@ export default class Digit extends PureComponent {
 
   componentDidMount() {
     const tween = new TWEEN.Tween({ rotate: 0, y: 0 });
-    tween.to({ rotate: 180, y: offset }, flipDuration)
+    tween.to({ rotate: 180, y: yOffset }, flipDuration)
       .onUpdate(({ rotate, y }) => {
         setTransform(this.back, `rotateX(${-180 + rotate}deg) translateY(${y}px)`);
         setTransform(this.front, `rotateX(${rotate}deg) translateY(-${y}px)`);
@@ -105,7 +105,7 @@ export default class Digit extends PureComponent {
     if (this.state.completed) return;
     if (value !== this.props.value) {
       if (flipped) {
-        setTimeout(() => this.setState({ value }), flipDuration / 2);
+        setTimeout(() => this.setState({ value }), flipDuration)
       } else {
         this.tween.start();
         this.animate();
@@ -114,10 +114,10 @@ export default class Digit extends PureComponent {
   }
 
   animate = (timestamp) => {
-    const { zFlipped, value } = this.state;
+    const { zFlipped } = this.state;
     this.startTime = this.startTime || timestamp;
     if ((timestamp - this.startTime) > flipDuration / 2 && !zFlipped) {
-      this.setState({ zFlipped: true, value: value + 1 });
+      this.setState({ zFlipped: true });
     }
     this.animation = requestAnimationFrame(this.animate);
     TWEEN.update();
@@ -126,14 +126,13 @@ export default class Digit extends PureComponent {
   render() {
     const { flipped } = this.props;
     const { value, zFlipped } = this.state;
-    const num = value % 10;
     return (
-      <Wrapper style={{ zIndex: 10 - num }}>
+      <Wrapper style={{ zIndex: flipped ? 1 : 10 - value }}>
         <FlipBack innerRef={(ref) => (this.back = ref)} zFlipped={zFlipped} flipped={flipped}>
-          <DigitLower>{num}</DigitLower>
+          <DigitLower>{value === 9 ? 0 : value + 1}</DigitLower>
         </FlipBack>
         <FlipFront innerRef={(ref) => (this.front = ref)} zFlipped={zFlipped} flipped={flipped}>
-          <DigitUpper>{num}</DigitUpper>
+          <DigitUpper>{value < 0 ? 9 : value}</DigitUpper>
         </FlipFront>
       </Wrapper>
     );

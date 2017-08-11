@@ -1,4 +1,5 @@
-import React, { PureComponent, PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import Digit from '../Digit';
@@ -12,37 +13,22 @@ const Wrapper = styled.div`
   margin: 0.125rem;
 `;
 
-export default class Flip extends PureComponent {
-  static propTypes = {
-    value: PropTypes.number,
-    className: PropTypes.string,
-    style: PropTypes.object,
-  }
+const repeat = 3;
 
-  state = {
-    step: 0,
-  }
-
-  componentWillReceiveProps({ value }) {
-    if (value !== this.props.value) {
-      this.setState(({ step }) => ({ step: step + 1 }));
-    }
-  }
-
-  render() {
-    const { step } = this.state;
-    const { value, className, style } = this.props;
-    const repeat = 3;
-    return (
-      <Wrapper className={className} style={style}>
-        <Digit value={value} flipped />
-        {Array(repeat).fill(value).map((v, index) => step % repeat !== index && (
-          <Digit
-            key={`v-${index}`}
-            value={v}
-          />
-        ))}
-      </Wrapper>
-    );
-  }
+export default function Flip({ value, className, style, iter }) {
+  return (
+    <Wrapper className={className} style={style}>
+      <Digit value={value - 1} flipped />
+      {Array(repeat).fill(value).map((v, index) => iter % repeat !== index && (
+        <Digit key={`v-${index}`} value={v} />
+      ))}
+    </Wrapper>
+  );
 }
+
+Flip.propTypes = {
+  value: PropTypes.number,
+  iter: PropTypes.number,
+  className: PropTypes.string,
+  style: PropTypes.object,
+};
